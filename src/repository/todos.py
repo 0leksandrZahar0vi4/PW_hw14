@@ -56,6 +56,15 @@ async def create_todo(body: TodoSchema, db: AsyncSession, user: User):
     await db.commit()
     await db.refresh(todo)
     return todo
+    """
+    The create_todo function creates a new todo in the database.
+
+    :param body: TodoSchema: The body of the request
+    :param db: AsyncSession: Pass the database session to the function
+    :param user: User: Get the user who created the todo
+    :return: A todo object
+    """
+
 
 
 async def update_todo(todo_id: int, body: TodoUpdateSchema, db: AsyncSession, user: User):
