@@ -24,5 +24,7 @@ class TodoResponse(BaseModel):
     created_at: datetime | None
     updated_at: datetime | None
     user: UserResponse | None
-
     model_config = ConfigDict(from_attributes = True)  # noqa
+
+class RequestEmail(BaseModel):
+    email: EmailStr
