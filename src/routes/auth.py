@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, status, BackgroundTasks, 
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.exceptions import FastAPIError
 
 from src.database.db import get_db
 from src.repository import users as repositories_users
@@ -42,11 +43,11 @@ async def signup(body: UserSchema, bt: BackgroundTasks, request: Request, db: As
 async def login(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     user = await repositories_users.get_user_by_email(body.username, db)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.INVALID_EMAIL)
     if not user.confirmed:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email not confirmed")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.EMAIL_NOT_CONFIRMED)
     if not auth_service.verify_password(body.password, user.password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=messages.INVALID_PASSWORD)
     # Generate JWT
     access_token = await auth_service.create_access_token(data={"sub": user.email, "test": "Сергій Багмет"})
     refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
